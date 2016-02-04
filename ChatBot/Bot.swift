@@ -60,13 +60,11 @@ class Bot {
         
         if let text = message.text {
             if text.lowercaseString.rangeOfString(Constants.bestText) != nil
-            || text.lowercaseString.rangeOfString(Constants.fkBestText) != nil{
-                
-                if text.lowercaseString.rangeOfString(Constants.companyText) != nil {
+                && text.lowercaseString.rangeOfString(Constants.companyText) != nil {
                     response = BotResponses.companyResponse
-                } else if text.lowercaseString.rangeOfString(Constants.areaText) != nil {
+            } else if text.lowercaseString.rangeOfString(Constants.fkBestText) != nil
+                && text.lowercaseString.rangeOfString(Constants.areaText) != nil {
                     response = BotResponses.areaResponse
-                }
             }
         }
         
