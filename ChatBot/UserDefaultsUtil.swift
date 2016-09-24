@@ -12,38 +12,38 @@ class UserDefaultsUtil {
     
     static let lastMessageIdReadKey = "lastMessageIdRead"
     
-    static func writeString(value: String, key: String) {
-        let defaults = NSUserDefaults.standardUserDefaults()
-        defaults.setObject(value, forKey: key)
+    static func writeString(_ value: String, key: String) {
+        let defaults = UserDefaults.standard
+        defaults.set(value, forKey: key)
     }
     
-    static func writeBool(value: Bool, key: String)
+    static func writeBool(_ value: Bool, key: String)
     {
-        let defaults = NSUserDefaults.standardUserDefaults()
-        defaults.setObject(value, forKey: key)
+        let defaults = UserDefaults.standard
+        defaults.set(value, forKey: key)
     }
     
-    static func writeInt(value: Int, key: String)
+    static func writeInt(_ value: Int, key: String)
     {
-        let defaults = NSUserDefaults.standardUserDefaults()
-        defaults.setObject(value, forKey: key)
+        let defaults = UserDefaults.standard
+        defaults.set(value, forKey: key)
     }
     
-    static func readValue(key:String) -> AnyObject? {
+    static func readValue(_ key:String) -> AnyObject? {
         var value: AnyObject?
         
-        let defaults = NSUserDefaults.standardUserDefaults()
-        if let storedValue = defaults.valueForKey(key) {
-            value = storedValue
+        let defaults = UserDefaults.standard
+        if let storedValue = defaults.value(forKey: key) {
+            value = storedValue as AnyObject?
         }
         
         return value
     }
     
-    static func deleteValue(key: String)
+    static func deleteValue(_ key: String)
     {
-        let defaults = NSUserDefaults.standardUserDefaults()
-        defaults.removeObjectForKey(key)
+        let defaults = UserDefaults.standard
+        defaults.removeObject(forKey: key)
     }
     
 }

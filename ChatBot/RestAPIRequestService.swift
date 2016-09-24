@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Alamofire
 
 class RestAPIRequestService {
     
@@ -19,27 +20,27 @@ class RestAPIRequestService {
         return defaultHeaders
     }
     
-    func getStatusCode(response: NSURLResponse) -> Int {
+    func getStatusCode(_ response: DataResponse<Any>?) -> Int {
         var statusCode = 0
         
-        if let httpResponse = response as? NSHTTPURLResponse {
+        if let httpResponse = response?.response {
             statusCode = httpResponse.statusCode as Int
         }
         
         return statusCode
     }
     
-    func generateObjectParameters(object : NSObject) -> [String:AnyObject]{
+    func generateObjectParameters(_ object : NSObject) -> [String:AnyObject]{
         let mirroredObject = Mirror(reflecting: object)
         
         var requestParameters = [String:AnyObject]()
         
-        for (_, attribute) in mirroredObject.children.enumerate() {
+        for (_, attribute) in mirroredObject.children.enumerated() {
             
             if let propertyName = attribute.label as String! {
                 
-                if let value = object.valueForKey(propertyName) {
-                    requestParameters[propertyName] = value
+                if let value = object.value(forKey: propertyName) {
+                    requestParameters[propertyName] = value as AnyObject?
                 }
             }
         }

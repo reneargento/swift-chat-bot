@@ -20,13 +20,13 @@ class Bot {
             completionHandler: { (data, response, error) -> Void in
                 do {
                     
-                    let jsonDictionary = try NSJSONSerialization.JSONObjectWithData(data!, options: NSJSONReadingOptions.MutableContainers) as! NSDictionary
+                    let jsonDictionary = try JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions.mutableContainers) as! NSDictionary
                     let messageService = MessageService()
                     
-                    let ok = jsonDictionary.valueForKey(RestAPIManager.okKey) as! Bool
+                    let ok = jsonDictionary.value(forKey: RestAPIManager.okKey) as! Bool
                     
                     if(ok){
-                        let result = jsonDictionary.valueForKey(RestAPIManager.resultKey) as! NSArray
+                        let result = jsonDictionary.value(forKey: RestAPIManager.resultKey) as! NSArray
                         
                         var messageList = messageService.getMessagesFromResponse(result as! [NSDictionary])
                         
@@ -55,42 +55,45 @@ class Bot {
         })
     }
     
-    private func handleMessage(message: Message) {
-        var response = BotResponses.defaultResponse
-        
-        if let text = message.text {
-            if text.lowercaseString.rangeOfString(Constants.bestText) != nil
-                && text.lowercaseString.rangeOfString(Constants.companyText) != nil {
-                    response = BotResponses.companyResponse
-            } else if text.lowercaseString.rangeOfString(Constants.fkBestText) != nil
-                && text.lowercaseString.rangeOfString(Constants.areaText) != nil {
-                    response = BotResponses.areaResponse
-            }
-        }
-        
-        sendMessage(response)
-    }
     
-    private func sendMessage(response: String) {
+    fileprivate func sendMessage(_ response: String) {
         let restAPIManager = RestAPIManager.restAPIManagerInstance
         let restAPIRequestService = RestAPIRequestService()
         
         let requestURL = "\(Constants.botToken)\(RestAPIManager.sendMessageUrl)"
         
         var requestParameters = [String:AnyObject]()
-        requestParameters[Message.chatIdKey] = Constants.chatId
-        requestParameters[Message.textKey] = response
+        requestParameters[Message.chatIdKey] = Constants.chatId as AnyObject?
+        requestParameters[Message.textKey] = response as AnyObject?
         
         restAPIManager.postRequest(requestURL, parameters: requestParameters) { (data, response, error) -> Void in
             if error == nil {
                 let statusCode = restAPIRequestService.getStatusCode(response!)
                 
-                if statusCode == ResponseEnum.OKResponse.rawValue {
+                if statusCode == ResponseEnum.okResponse.rawValue {
                     print("ChatBot just answered the message!")
                 }
             } else {
                 print("An exception occurred when sending the message")
             }
+        }
+    }
+    
+    fileprivate func handleMessage(_ message: Message) {
+        var response = BotResponses.defaultResponse
+        
+        if let text = message.text {
+            if text.lowercased().range(of: Constants.bestText) != nil
+                || text.lowercased().range(of: Constants.fkBestText) != nil{
+                
+                if text.lowercased().range(of: Constants.companyText) != nil {
+                    response = BotResponses.companyResponse
+                } else if text.lowercased().range(of: Constants.areaText) != nil {
+                    response = BotResponses.areaResponse
+                }
+            }
+            
+            sendMessage(response)
         }
     }
     

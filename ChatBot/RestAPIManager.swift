@@ -11,8 +11,8 @@ import Alamofire
 
 class RestAPIManager {
     
-    typealias GenericRequestCompletionHandler = (success:Bool, statusCode: Int, error:NSError?) -> Void
-    typealias RestAPICompletionHandler = (data: NSData?, response: NSURLResponse?, error:NSError?) -> Void
+    typealias GenericRequestCompletionHandler = (_ success:Bool, _ statusCode: Int, _ error:NSError?) -> Void
+    typealias RestAPICompletionHandler = (_ data: Data?, _ response: DataResponse<Any>?, _ error:NSError?) -> Void
     
     static let restAPIManagerInstance = RestAPIManager()
     
@@ -33,12 +33,13 @@ class RestAPIManager {
     //Header value - Content Types
     static let applicationJsonHeaderValue = "application/json"
     
-    private init() {
+    fileprivate init() {
         //Singleton
     }
     
-    func getRequest(urlPath: String, var parameters: [String:AnyObject]?,
-        completionHandler:RestAPIManager.RestAPICompletionHandler) {
+    func getRequest(_ urlPath: String, parameters: [String:AnyObject]?,
+        completionHandler:@escaping RestAPIManager.RestAPICompletionHandler) {
+        var parameters = parameters
         
         let requestURL = String(format: "%@%@", RestAPIManager.telegramURL, urlPath)
         let restAPIRequestService = RestAPIRequestService()
@@ -46,8 +47,8 @@ class RestAPIManager {
         if parameters != nil {
             var whereParameters = [String:AnyObject]()
             
-            let data = try! NSJSONSerialization.dataWithJSONObject(parameters!, options: NSJSONWritingOptions(rawValue: 0))
-            let jsonParameters = NSString(data: data, encoding: NSUTF8StringEncoding)
+            let data = try! JSONSerialization.data(withJSONObject: parameters!, options: JSONSerialization.WritingOptions(rawValue: 0))
+            let jsonParameters = NSString(data: data, encoding: String.Encoding.utf8.rawValue)
             print(jsonParameters)
             whereParameters[RestAPIManager.whereKey] = jsonParameters
             
@@ -58,15 +59,15 @@ class RestAPIManager {
         
         print(requestURL)
         
-        Alamofire.request(.GET, requestURL, headers: headers, parameters: parameters)
-            .response { request, response, data, error in
-                completionHandler(data: data, response: response, error:error)
+        Alamofire.request(requestURL, parameters: parameters, headers: headers)
+            .responseJSON { response in
+                completionHandler(response.data, response, response.result.error as NSError?)
         }
     }
 
     
-    func postRequest(requestURL: String, parameters: [String:AnyObject],
-        contentType: String = RestAPIManager.applicationJsonHeaderValue, completionHandler:RestAPICompletionHandler) {
+    func postRequest(_ requestURL: String, parameters: [String:AnyObject],
+        contentType: String = RestAPIManager.applicationJsonHeaderValue, completionHandler:@escaping RestAPICompletionHandler) {
             
             let requestURL = String(format: "%@%@", RestAPIManager.telegramURL, requestURL)
             print(requestURL)
@@ -75,9 +76,9 @@ class RestAPIManager {
             
             headers[RestAPIManager.contentTypeHeaderKey] = contentType
             
-            Alamofire.request(.POST, requestURL, parameters: parameters, headers: headers, encoding: .JSON)
-                .response { request, response, data, error in
-                    completionHandler(data: data, response: response, error:error)
+        Alamofire.request(requestURL, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
+                .responseJSON { response in
+                    completionHandler(response.data, response, response.result.error as NSError?)
             }
     }
 }

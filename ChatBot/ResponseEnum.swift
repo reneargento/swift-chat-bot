@@ -10,10 +10,10 @@ import Foundation
 
 enum ResponseEnum: Int {
     
-    case OKResponse = 200
-    case CreatedResponse = 201
-    case Error = 400
+    case okResponse = 200
+    case createdResponse = 201
+    case error = 400
     
-    static let allValues = [OKResponse, CreatedResponse, Error]
+    static let allValues = [okResponse, createdResponse, error]
     
 }

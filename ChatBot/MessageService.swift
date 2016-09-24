@@ -7,10 +7,30 @@
 //
 
 import Foundation
+fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l < r
+  case (nil, _?):
+    return true
+  default:
+    return false
+  }
+}
+
+fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l > r
+  default:
+    return rhs < lhs
+  }
+}
+
 
 class MessageService {
     
-    func getMessagesFromResponse(results: [NSDictionary]) -> [Message] {
+    func getMessagesFromResponse(_ results: [NSDictionary]) -> [Message] {
         var messageList = [Message]()
         
         for index in 0..<results.count{
@@ -20,11 +40,11 @@ class MessageService {
         return messageList
     }
     
-    func orderMessagesBasedOnId(inout messageList: [Message]) {
-        messageList.sortInPlace { $0.messageId! < ($1.messageId!) }
+    func orderMessagesBasedOnId(_ messageList: inout [Message]) {
+        messageList.sort { $0.messageId! < ($1.messageId!) }
     }
     
-    func checkIfANewMessageArrived(messageId: Int) -> Bool{
+    func checkIfANewMessageArrived(_ messageId: Int) -> Bool{
         
         var isANewMessage = false
         

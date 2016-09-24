@@ -26,7 +26,7 @@ class Message {
         self.transformArray(dictionary)
     }
     
-    func transformArray(dictionary: NSDictionary){
+    func transformArray(_ dictionary: NSDictionary){
         if let date = dictionary[Message.dateKey] as? Int{
             self.date = date
         }

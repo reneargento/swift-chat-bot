@@ -14,7 +14,7 @@ class ChatService : NSObject{
     let bot = Bot()
     
     func listenForUpdates() {
-        let _ = NSTimer.scheduledTimerWithTimeInterval(Constants.secondsToWaitBeforeChecking, target: self, selector: Selector(checkChatRoomSelector), userInfo: nil, repeats: true)
+        let _ = Timer.scheduledTimer(timeInterval: Constants.secondsToWaitBeforeChecking, target: self, selector: Selector(checkChatRoomSelector), userInfo: nil, repeats: true)
     }
     
     func checkChatRoom() {
